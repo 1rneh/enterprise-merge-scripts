@@ -156,7 +156,9 @@ class MachOps:
         if self.dry_run:
             dry("./mach " + " ".join(a for a in args))
             return 0
-        rc = subprocess.run([mach, *args]).returncode
+        # Invoke via the interpreter: on Windows, CreateProcess can't run a
+        # shebang script directly (WinError 193).
+        rc = subprocess.run([sys.executable, mach, *args]).returncode
         if rc != 0 and not allow_fail:
             raise MergeError(f"./mach {' '.join(args)} failed (exit {rc})")
         return rc
